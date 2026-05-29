@@ -16,12 +16,15 @@ const utenteSchema =new mongoose.Schema({
     },
     eta: Number,
     telefono: String,
-    pIva: String,
+    pIva: {
+        type: String,
+        unique: true,
+    },
 
-    professione:[{
+    professione:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'Professione',
-    }],
+    },
 
     servizi:[{
         type: mongoose.Schema.Types.ObjectId,

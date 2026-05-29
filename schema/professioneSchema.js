@@ -1,15 +1,5 @@
 const mongoose=require("mongoose");
 const professioneSchema=new mongoose.Schema({
-    nome:{
-        type:String,
-        required:true,
-        unique:true,
-    },
-    cognome:{
-        type:String,
-        required:true,
-        unique:true,
-    },
     categoria:{
         type:String,
         required:true,
