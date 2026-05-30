@@ -13,5 +13,5 @@ mongoose.connection.once("open", ()=>{
     app.listen(port, ()=>{
         console.log("Listening on port", port)
     })
-
 })
+app.use(express.json())
