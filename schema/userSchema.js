@@ -23,7 +23,11 @@ const userSchema =new mongoose.Schema({
     address:String,
     city:String,
     age: Number,
-    email: String,
+    email: {
+        type: String,
+        required: true,
+        unique:true,
+    },
     phone: String,
     balance:{
         type: Number,
