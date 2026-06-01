@@ -1,6 +1,8 @@
 require("dotenv").config();
 const mongoose = require('mongoose')
-const express = require('express')
+const express = require("express")
+const userController= require('./controllers/userController')
+
 
 const app = express();
 const port = process.env.PORT
@@ -14,4 +16,7 @@ mongoose.connection.once("open", ()=>{
         console.log("Listening on port", port)
     })
 })
+
 app.use(express.json())
+
+app.post("/newUser", userController.createUser)

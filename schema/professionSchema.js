@@ -7,13 +7,7 @@ const professionSchema=new mongoose.Schema({
     category:{
         type:String,
         required:true,
-        enum:[
-            'Informatica e Tech',
-            'Design e Grafica',
-            'Scrittura e Traduzione',
-            'Video e Audio',
-            'Altro'
-        ],
+        description:[String],
         default: 'Altro',
     },
     description:{
