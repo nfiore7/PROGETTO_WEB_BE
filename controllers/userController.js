@@ -40,8 +40,8 @@ module.exports= {
 
     getAllDealers: async function(req,res){
          try {
-             const dealers = await User.findMany({role: req.params.role})
-             dealers ? res.status(200).json(dealers) : res.status(404).json({message: "Nessun fornitore trovato"})
+             const dealers = await User.find({role: "dealer"})
+             dealers.length !==0 ? res.status(200).json(dealers) : res.status(404).json({message: "Nessun fornitore trovato"})
          }
          catch (err) {
              res.status(500).json({message: "Qualcosa è andato storto" + err})
@@ -49,7 +49,7 @@ module.exports= {
     },
 
     getUser : async function(req,res){
-        const id = await req.params._id
+        const id = req.params._id
         try{
          const user = await User.findById({_id: id})
              user ? res.status(200).json(user) : res.status(404).json({message: "Utente inesistente"})
@@ -60,11 +60,11 @@ module.exports= {
     },
 
     updateUser: async function (req,res){
-        const data = await req.body
-        const id = await req.params._id
+        const data = req.body
+        const id = req.params._id
         try {
             const user = await User.findById({_id: id})
-            if (!user) res.status(404).json({message: "Utente insesistente"})
+            if (!user) res.status(404).json({message: "Utente non trovato"})
             else {
                 await User.updateOne(
                     {_id: req.params._id},

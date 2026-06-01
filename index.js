@@ -20,7 +20,4 @@ mongoose.connection.once("open", ()=>{
 
 app.use(express.json())
 
-
 app.use("/user", userRouter)
-app.post("/newUser", userController.createUser)
-app.get("/users", userController.getAllUsers )
