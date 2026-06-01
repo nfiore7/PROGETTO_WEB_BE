@@ -1,5 +1,6 @@
 const express = require('express')
 const User = require('../schema/userSchema')
+
 module.exports= {
      createUser: async function (req, res) {
         const data = req.body;

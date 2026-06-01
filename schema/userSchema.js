@@ -1,6 +1,7 @@
 /**Qui modelliamo lo schema dei vari utenti i quali possono essere sia clienti che fornitori */
 
 const mongoose = require('mongoose');
+const bcrypt = require("bcrypt")
 
 const userSchema =new mongoose.Schema({
     username: {
@@ -57,5 +58,17 @@ const userSchema =new mongoose.Schema({
     }],
     },{timestamps:true}
 )
+
+userSchema.pre("save", async (next)=> {
+    let user = this;
+    const saltRounds = 10
+    this.password = await bcrypt.hash(user.password, saltRounds);
+    next();
+})
+
+userSchema.methods.passwordComparison = function(inputPassword) {
+    let user = this;
+    return bcrypt.compare(inputPassword, user.password);
+}
 module.exports = mongoose.model('Users',userSchema);
 

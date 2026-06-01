@@ -2,7 +2,6 @@ const express = require("express")
 const userController = require("../controllers/userController");
 const userRouter = express.Router()
 
-
 userRouter.get("/dealers",userController.getAllDealers)
 userRouter.get("/allusers", userController.getAllUsers)
 userRouter.get("/profession/:profession", userController.getUserByProfession)
