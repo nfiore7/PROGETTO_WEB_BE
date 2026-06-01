@@ -50,8 +50,8 @@ module.exports= {
 
     getAllDealers: async function(req,res){
          try {
-             const dealers = await User.find({role: "dealer"})
-             if(dealers.length !==0) { 
+             const dealers = await User.find({isDealer:true})
+             if(dealers.length) {
                 res.status(200).json(dealers)
             }
               else {
@@ -96,12 +96,15 @@ module.exports= {
         try {
             const user = await User.findById({_id: id})
             if (!user) {return res.status(404).json({message: "Utente non trovato"})}
-            else {
-                await User.updateOne(
-                    {_id: req.params._id},
-                    {$set: data})
-                return res.status(200).json({message: "Modifica effettuata con successo"})
+            const {password, ...updates} = req.body;
+            user.set(updates)
+
+
+            if(password){
+                user.password = req.body.password
             }
+            await user.save()
+            res.status(200).json(user)
         }
      catch(err){ res.status(500).json({message: "Qualcosa è andato storto" + err})
         }

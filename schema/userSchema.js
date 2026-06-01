@@ -59,16 +59,21 @@ const userSchema =new mongoose.Schema({
     },{timestamps:true}
 )
 
-userSchema.pre("save", async (next)=> {
-    let user = this;
-    const saltRounds = 10
-    this.password = await bcrypt.hash(user.password, saltRounds);
-    next();
+userSchema.pre("save", async function() {
+    if (!this.isModified("password")) return ;
+    try {
+        let user = this
+        hash = await bcrypt.hash(user.password, 10)
+        this.password = hash
+
+    }catch(err){
+        console.log(err);
+    }
 })
 
-userSchema.methods.passwordComparison = function(inputPassword) {
-    let user = this;
-    return bcrypt.compare(inputPassword, user.password);
-}
-module.exports = mongoose.model('Users',userSchema);
+userSchema.methods.comparePassword = async function(candidatePassword){
+    return await bcrypt.compare(candidatePassword, this.password);
 
+}
+
+module.exports = mongoose.model('Users',userSchema);
