@@ -1,10 +1,33 @@
 {
-  "name": "Progetto_beta",
+  "name": "donedeal",
   "version": "1.0.0",
-  "description": "",
+  "private": true,
+  "description": "offire e cercare servizi",
+  "keywords": [
+    "servizi",
+    "clienti",
+    "freelance",
+    "acquisti"
+  ],
+  "homepage": "https://github.com/nfiore7/PROGETTO_WEB#readme",
+  "bugs": {
+    "url": "https://github.com/nfiore7/PROGETTO_WEB/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nfiore7/PROGETTO_WEB.git"
+  },
+  "license": "ISC",
+  "author": "Vincenzo, Nicola, Savino",
+  "type": "commonjs",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "private": true
+  "dependencies": {
+    "@types/express": "^5.0.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mongoose": "^9.6.3"
+  }
 }
