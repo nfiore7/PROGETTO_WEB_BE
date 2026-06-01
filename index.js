@@ -2,6 +2,7 @@ require("dotenv").config();
 const mongoose = require('mongoose')
 const express = require("express")
 const userController= require('./controllers/userController')
+const userRouter = require("./routes/userRoute")
 
 
 const app = express();
@@ -19,4 +20,7 @@ mongoose.connection.once("open", ()=>{
 
 app.use(express.json())
 
+
+app.use("/user", userRouter)
 app.post("/newUser", userController.createUser)
+app.get("/users", userController.getAllUsers )

@@ -8,7 +8,6 @@ const professionSchema=new mongoose.Schema({
         type:String,
         required:true,
         description:[String],
-        default: 'Altro',
     },
     description:{
         type:String,
