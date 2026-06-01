@@ -4,5 +4,6 @@
     <content url="file://$MODULE_DIR$/../Progetto-backend" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="@types/express" level="application" />
   </component>
 </module>

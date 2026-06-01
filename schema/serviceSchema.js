@@ -15,11 +15,6 @@ const serviceSchema = new mongoose.Schema({
 
     cost: Number,
 
-    deliveryDays:{
-        type:String,
-        required: true,
-    },
-
     dealer:{
         type: mongoose.Schema.Types.ObjectId, ref: 'Users',
         required: true,

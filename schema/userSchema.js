@@ -34,10 +34,9 @@ const userSchema =new mongoose.Schema({
         required: true,
         default:0.0,
     },
-    role:{
-        type: [String],
-        enum:['customer','dealer'],
-        default: ['customer']
+    isDealer:{
+        type: Boolean,
+        default: false,
     },
     dealerData:{
         pIva:{
@@ -46,7 +45,7 @@ const userSchema =new mongoose.Schema({
         },
         companyAddress: String,
         profession:{
-            type: mongoose.Schema.Types.ObjectId, ref: 'Profession',
+            type: String,
         },
         dealerBalance: {
             type:Number,
