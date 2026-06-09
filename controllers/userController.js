@@ -1,6 +1,7 @@
 const express = require('express')
 const User = require('../schema/userSchema')
 
+
 module.exports= {
      createUser: async function (req, res) {
         const data = req.body;
@@ -10,7 +11,7 @@ module.exports= {
                 return res.status(409).json({message: "Utente gia registrato"})
             }
                 
-            newUser = new User({
+            const newUser = new User({
                 username: data.username,
                 password: data.password,
                 name: data.name,
@@ -91,20 +92,20 @@ module.exports= {
 
 
     updateUser: async function (req,res){
-        const data = req.body
         const id = req.params._id
+        const {password, ...updates} = req.body;
+
         try {
             const user = await User.findById({_id: id})
             if (!user) {return res.status(404).json({message: "Utente non trovato"})}
-            const {password, ...updates} = req.body;
             user.set(updates)
 
 
             if(password){
                 user.password = req.body.password
             }
-            await user.save()
-            res.status(200).json(user)
+            const newUser = await user.save()
+            res.status(200).json({message: "Utente modificato con successo", newUser})
         }
      catch(err){ res.status(500).json({message: "Qualcosa è andato storto" + err})
         }

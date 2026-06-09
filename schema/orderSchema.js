@@ -39,6 +39,6 @@ const orderSchema = new mongoose.Schema({
         default: 'da effettuare'
     }
 
-
-
 })
+
+module.exports = mongoose.model("Orders",orderSchema)

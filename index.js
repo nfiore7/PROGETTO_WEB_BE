@@ -1,7 +1,6 @@
 require("dotenv").config();
 const mongoose = require('mongoose')
 const express = require("express")
-const userController= require('./controllers/userController')
 const userRouter = require("./routes/userRoute")
 
 
