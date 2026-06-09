@@ -60,12 +60,10 @@ module.exports = {
 
     addComment: async(req,res)=>{
         const data = req.body
-        console.log(data)
         const userId = req.params._id
         const serviceId = req.params.serviceId
         const user = await User.findById({_id: userId})
         const service = await Service.findById({_id: serviceId})
-        console.log(req.params)
 
 
         if(!service){
@@ -84,7 +82,7 @@ module.exports = {
             }
             service.comments.push(comment)
             await service.save()
-            res.status(200).json({message:"Commento modificato con successo"})
+            res.status(200).json({message:"Commento aggiunto con successo"})
         }catch (err){
             res.status(500).json({message:"Errore interno del server", error:err})
         }
