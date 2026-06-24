@@ -5,12 +5,13 @@ const userRouter = express.Router()
 
 userRouter.get("/dealers",userController.getAllDealers)
 userRouter.get("/allusers", userController.getAllUsers)
-userRouter.get("/profession/:profession", userController.getUserByProfession)
+userRouter.get("/professions/:profession", userController.getUserByProfession)
 userRouter.get("/:_id", userController.getUser)
 userRouter.post("/new", userController.createUser)
-userRouter.post("/:_id/service/new", serviceController.createService)
-userRouter.patch("/:_id/service/:serviceId", serviceController.updateService)
-userRouter.post("/:_id/service/:serviceId/comment", serviceController.addComment)
+userRouter.post("/:_id/services/new", serviceController.createService)
+userRouter.patch("/:_id/services/:serviceId", serviceController.updateService)
+userRouter.post("/:_id/services/:serviceId/comments/new", serviceController.addComment)
+userRouter.patch("/:_id/services/:serviceId/comments/:commentId", serviceController.updateComment)
 userRouter.patch("/:_id", userController.updateUser)
 
 

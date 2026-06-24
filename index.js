@@ -2,6 +2,7 @@ require("dotenv").config();
 const mongoose = require('mongoose')
 const express = require("express")
 const userRouter = require("./routes/userRoute")
+const serviceController = require("./controllers/serviceController");
 
 
 const app = express();
@@ -20,3 +21,4 @@ mongoose.connection.once("open", ()=>{
 app.use(express.json())
 
 app.use("/user", userRouter)
+app.get("/services/:serviceId/comments", serviceController.getComments)

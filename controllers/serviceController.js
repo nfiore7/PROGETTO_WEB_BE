@@ -86,7 +86,45 @@ module.exports = {
         }catch (err){
             res.status(500).json({message:"Errore interno del server", error:err})
         }
+    },
 
+    updateComment: async (req, res)=>{
+        const data = req.body;
+        const commentId = req.params.commentId;
+        const userId = req.params._id
+
+        try{
+            const service = await Service.findOne({"comments._id":commentId})
+            if(!service){
+                return res.status(404).json({message:"Servizio o commento non trovato"})
+            }
+            const comment = service.comments.id(commentId)
+            if (comment.user.toString() !== userId){
+                return res.status(403).json({message:"Non sei autorizzato a modificare questo commento"})
+            }
+            comment.comment = data.comments.comment
+            await service.save()
+            return res.status(200).json({message:"Commento modificato con successo"})
+
+        }catch(err){
+            res.status(500).json({message:"Errore interno del server", error:err.message})
+        }
+
+    },
+    getComments : async function(req,res){
+        const serviceId = req.params.serviceId
+
+        try{
+            const service = await Service.findById(serviceId)
+            const comments = service.comments
+            if (comments.length === 0){
+                return res.status(404).json({message: "Commento inesistente"});
+            }
+            return res.status(200).json(comments);
+        }
+        catch(err){
+            return res.status(500).json({message: "Qualcosa è andato storto" + err.message})
+        }
     }
 
 
