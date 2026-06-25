@@ -23,8 +23,7 @@ module.exports= {
                 email: data.email,
                 phone: data.phone,
                 balance: data.balance,
-                role: data.role,
-                isDealer: data.isDealer,
+                role: data.role || 'customer',
                 dealerData: data.dealerData,
                 services: data.services,
             });
@@ -53,7 +52,7 @@ module.exports= {
 
     getAllDealers: async function(req,res){
          try {
-             const dealers = await User.find({isDealer:true})
+             const dealers = await User.find({role: 'dealer'})
              if(dealers.length) {
                 res.status(200).json(dealers)
             }
@@ -111,6 +110,18 @@ module.exports= {
         }
      catch(err){ res.status(500).json({message: "Qualcosa è andato storto" + err})
         }
+    },
+
+    deleteUser: async function (req,res){
+        const id = req.params._id
+        const user = await User.findById({_id: id})
+        if(!user){
+            return res.status(404).json({message: "Utente non trovato"})
+        }
+
+
     }
+
+
 
 }

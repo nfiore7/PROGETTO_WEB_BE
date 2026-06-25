@@ -35,9 +35,11 @@ const userSchema =new mongoose.Schema({
         required: true,
         default:0.0,
     },
-    isDealer:{
-        type: Boolean,
-        default: false,
+    role:{
+        type: String,
+        enum: ['admin', 'costumer', 'dealer'],
+        default: "costumer",
+        required: true
     },
     dealerData:{
         pIva:{
