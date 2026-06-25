@@ -12,7 +12,7 @@ module.exports = {
         if(!user){
             return res.status(404).json({message:"Utente non trovato"})
         }
-        if(!user.isDealer){
+        if(user.role !== 'dealer'){
             return res.status(403).json({message:"L'utente non è un dealer"})
         }
         try{
@@ -40,7 +40,7 @@ module.exports = {
             return res.status(404).json({message: "Utente non trovato"})
         }
 
-        if(!user.isDealer){
+        if(user.role !== 'dealer'){
             return res.status(403).json({message: "Utente non è un dealer"})
         }
 

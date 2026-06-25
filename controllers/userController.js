@@ -119,8 +119,8 @@ module.exports= {
         if(!user){
             return res.status(404).json({message: "Utente non trovato"})
         }
-
-
+        await User.findByIdAndDelete(id)
+        return res.status(200).json({message: "Utente eliminato con successo"})
     }
 
 
