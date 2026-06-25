@@ -1,10 +1,13 @@
 const express = require("express")
 const userController = require("../controllers/userController");
 const serviceController = require("../controllers/serviceController");
+const auth = require("../controllers/authMiddleware");
+const login = require("../controllers/login");
 const userRouter = express.Router()
 
+userRouter.post("/login", login)
 userRouter.get("/dealers",userController.getAllDealers)
-userRouter.get("/allusers", userController.getAllUsers)
+userRouter.get("/allusers", auth,userController.getAllUsers)
 userRouter.get("/professions/:profession", userController.getUserByProfession)
 userRouter.get("/:_id", userController.getUser)
 userRouter.post("/new", userController.createUser)

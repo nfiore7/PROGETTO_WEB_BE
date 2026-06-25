@@ -19,7 +19,10 @@ mongoose.connection.once("open", ()=>{
     })
 })
 
-app.use(cors())
+app.use(cors({
+    origin: '*',
+    exposedHeaders: ['Authorization']
+}))
 app.use(express.json())
 
 app.use("/users", userRouter)

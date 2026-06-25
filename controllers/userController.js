@@ -36,6 +36,7 @@ module.exports= {
     },
 
     getAllUsers: async function (req, res) {
+         console.log(req)
         try {
              const users = await User.find()
                 if(users.length !==0) { 
