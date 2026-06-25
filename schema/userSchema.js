@@ -43,6 +43,7 @@ const userSchema =new mongoose.Schema({
         pIva:{
             type: String,
             unique:true,
+            sparse:true
         },
         companyAddress: String,
         profession:{

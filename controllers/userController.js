@@ -10,6 +10,7 @@ module.exports= {
             if(existingUser) {
                 return res.status(409).json({message: "Utente gia registrato"})
             }
+
                 
             const newUser = new User({
                 username: data.username,
@@ -23,7 +24,8 @@ module.exports= {
                 phone: data.phone,
                 balance: data.balance,
                 role: data.role,
-                dealer: data.dealerData,
+                isDealer: data.isDealer,
+                dealerData: data.dealerData,
                 services: data.services,
             });
             

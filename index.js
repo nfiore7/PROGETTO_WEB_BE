@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const express = require("express")
 const userRouter = require("./routes/userRoute")
 const serviceController = require("./controllers/serviceController");
+const cors = require("cors")
 
 
 const app = express();
@@ -18,7 +19,8 @@ mongoose.connection.once("open", ()=>{
     })
 })
 
+app.use(cors())
 app.use(express.json())
 
-app.use("/user", userRouter)
+app.use("/users", userRouter)
 app.get("/services/:serviceId/comments", serviceController.getComments)
