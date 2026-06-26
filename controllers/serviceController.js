@@ -142,6 +142,20 @@
                     
                     }
                 },
+
+            getMyServices: async function (req, res) {
+                const userId = req.params.userId;
+                 try {
+                     const services = await Service.find({dealer: userId})
+                     if (services.length === 0) {
+                         res.status(404).json({message: "Nessun servizio trovato"})
+                     }
+                     res.status(200).json(services)
+                 }catch (err){
+                     res.status(500).json({message:"Errore interno del server"})
+                 }
+
+            },
                 
                 
             getComments : async function(req,res){
