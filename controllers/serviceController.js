@@ -73,6 +73,10 @@
                 if(!user){
                     return res.status(404).json({message: "Utente non trovato"})
                 }
+                if(userId === service.dealer.toString()){
+                    return res.status(401).json({message:"Il dealer non può commentare un suo servizio"})
+                }
+
 
                 try{
                     const comment = {
@@ -116,7 +120,7 @@
                 const serviceId = req.params.serviceId;
 
                 try{
-                    service = await Service.findById(serviceId)
+                    service = await Service.findById(serviceId).populate("comments.user","username");
                     if(!service){
                         return res.status(404).json({message:"Servizio non trovato"})
                     }
