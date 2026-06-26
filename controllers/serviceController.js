@@ -35,7 +35,7 @@
                 const id = req.params._id
                 const serviceId = req.params.serviceId
 
-                const user = await userController.getUserById(id)
+                const user = await User.findById(id)
                 if(!user){
                     return res.status(404).json({message: "Utente non trovato"})
                 }
