@@ -112,6 +112,20 @@
 
             },
 
+            getService: async (req, res) => {
+                const serviceId = req.params.serviceId;
+
+                try{
+                    service = await Service.findById(serviceId)
+                    if(!service){
+                        return res.status(404).json({message:"Servizio non trovato"})
+                    }
+                    res.status(200).json(service)
+                }catch(err){
+                    res.status(500).json({message:"Errore interno del server"})
+                }
+            },
+
             getAllServices: async function (req, res)  {
                 try{
                     const services = await Service.find().populate("dealer", "name lastname username city")

@@ -14,8 +14,8 @@ userRouter.post("/new", userController.createUser)
 userRouter.post("/:_id/services/new", serviceController.createService)
 userRouter.patch("/:_id/services/:serviceId", serviceController.updateService)
 userRouter.post("/:_id/services/:serviceId/comments/new", serviceController.addComment)
-userRouter.patch("/:_id/services/:serviceId/comments/:commentId", serviceController.updateComment)
-userRouter.patch("/:_id", userController.updateUser)
+userRouter.patch("/:_id/services/:serviceId/comments/:commentId", auth,serviceController.updateComment)
+userRouter.patch("/:_id", auth,userController.updateUser)
 userRouter.delete("/:_id", auth, userController.deleteUser)
 
 

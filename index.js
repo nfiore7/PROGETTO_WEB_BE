@@ -2,6 +2,7 @@ require("dotenv").config();
 const mongoose = require('mongoose')
 const express = require("express")
 const userRouter = require("./routes/userRoute")
+const serviceRouter = require("./routes/serviceRoute")
 const serviceController = require("./controllers/serviceController");
 const cors = require("cors")
 
@@ -26,8 +27,7 @@ app.use(cors({
 app.use(express.json())
 
 app.use("/users", userRouter)
-app.get("/services", serviceController.getAllServices)
-app.get("/services/:serviceId/comments", serviceController.getComments)
+app.use("/services", serviceRouter)
 
 
 // npx nodemon index.js 
