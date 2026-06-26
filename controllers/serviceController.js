@@ -125,6 +125,57 @@ module.exports = {
         catch(err){
             return res.status(500).json({message: "Qualcosa è andato storto" + err.message})
         }
+    },
+    deleteService: async (req, res) => {
+        const userId = req.params._id;
+        const serviceId = req.params.serviceId;
+
+        try {
+            const service = await Service.findById(serviceId);
+            if (!service) {
+                return res.status(404).json({ message: "Servizio non trovato" });
+            }
+
+            if (service.dealer.toString() !== userId) {
+                return res.status(403).json({ message: "Non autorizzato a eliminare questo servizio" });
+            }
+
+            // Rimuovi il riferimento nel modello User
+            await User.findByIdAndUpdate(userId, { $pull: { services: serviceId } });
+
+            await service.deleteOne();
+
+            return res.status(200).json({ message: "Servizio eliminato con successo" });
+        } catch (err) {
+            res.status(500).json({ message: "Errore interno del server", error: err.message });
+        }
+    },
+
+    deleteComment: async (req, res) => {
+        const userId = req.params._id;
+        const commentId = req.params.commentId;
+
+        try {
+            const service = await Service.findOne({ "comments._id": commentId });
+            if (!service) {
+                return res.status(404).json({ message: "Commento non trovato" });
+            }
+
+            const comment = service.comments.id(commentId);
+
+            // Verifica che l'utente sia l'autore del commento
+            if (comment.user.toString() !== userId) {
+                return res.status(403).json({ message: "Non autorizzato a eliminare questo commento" });
+            }
+
+            // Rimuovi il commento dall'array
+            service.comments.pull(commentId);
+            await service.save();
+
+            return res.status(200).json({ message: "Commento eliminato con successo" });
+        } catch (err) {
+            res.status(500).json({ message: "Errore interno del server", error: err.message });
+        }
     }
 
 
