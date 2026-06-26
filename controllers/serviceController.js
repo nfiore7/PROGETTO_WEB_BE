@@ -120,7 +120,9 @@
                 const serviceId = req.params.serviceId;
 
                 try{
-                    service = await Service.findById(serviceId).populate("comments.user","username");
+                    service = await Service.findById(serviceId)
+                        .populate("comments.user","username")
+                        .populate("dealer","username");
                     if(!service){
                         return res.status(404).json({message:"Servizio non trovato"})
                     }
