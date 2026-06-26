@@ -1,5 +1,6 @@
 const express = require('express')
 const User = require('../schema/userSchema')
+const jwt = require('jsonwebtoken')
 
 
 module.exports= {
@@ -29,6 +30,19 @@ module.exports= {
             });
             
             await newUser.save()
+            const token = jwt.sign(
+                {
+                    id: newUser._id,
+                    role: newUser.role,
+                    name: newUser.name,
+                    lastname: newUser.lastname,
+                    username: newUser.username,
+                },
+                process.env.JWT_SECRET,
+                {expiresIn: '24h'}
+            )
+            res.setHeader("Authorization", `Bearer ${token}`);
+            
             return res.status(201).json({message: "Utente registrato"})
         } catch (err) {
             return res.status(500).json({message: "Qualcosa è andato storto" + err})

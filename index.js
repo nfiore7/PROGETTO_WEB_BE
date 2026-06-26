@@ -26,4 +26,8 @@ app.use(cors({
 app.use(express.json())
 
 app.use("/users", userRouter)
+app.get("/services", serviceController.getAllServices)
 app.get("/services/:serviceId/comments", serviceController.getComments)
+
+
+// npx nodemon index.js 

@@ -16,6 +16,7 @@ userRouter.patch("/:_id/services/:serviceId", serviceController.updateService)
 userRouter.post("/:_id/services/:serviceId/comments/new", serviceController.addComment)
 userRouter.patch("/:_id/services/:serviceId/comments/:commentId", serviceController.updateComment)
 userRouter.patch("/:_id", userController.updateUser)
+userRouter.delete("/:_id", auth, userController.deleteUser)
 
 
 module.exports = userRouter;
