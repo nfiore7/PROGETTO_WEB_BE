@@ -3,9 +3,12 @@ const mongoose = require('mongoose')
 const express = require("express")
 const userRouter = require("./routes/userRoute")
 const serviceRouter = require("./routes/serviceRoute")
+const orderRouter = require("./routes/orderRoute")
 const serviceController = require("./controllers/serviceController");
 const cors = require("cors")
 const userController = require("./controllers/userController");
+const orderController = require("./controllers/orderController");
+
 
 
 const app = express();
@@ -29,5 +32,6 @@ app.use(express.json())
 
 app.use("/users", userRouter)
 app.use("/services", serviceRouter)
+app.use("/orders", orderRouter)
 app.get("/dealers",userController.getAllDealers)
-
+//ghudswxhguwsxdxshgwdu
