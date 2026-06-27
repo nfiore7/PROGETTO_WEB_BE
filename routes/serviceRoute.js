@@ -7,5 +7,4 @@ serviceRouter.get("/", serviceController.getAllServices)
 serviceRouter.get("/:serviceId", serviceController.getService)
 serviceRouter.get("/:serviceId/comments", serviceController.getComments)
 
-
 module.exports = serviceRouter

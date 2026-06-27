@@ -3,12 +3,14 @@ const userController = require("../controllers/userController");
 const serviceController = require("../controllers/serviceController");
 const auth = require("../controllers/authMiddleware");
 const login = require("../controllers/login");
+const orderController = require("../controllers/orderController");
 const userRouter = express.Router()
 
 userRouter.post("/login", login)
 userRouter.get("/allusers",userController.getAllUsers)
 userRouter.get("/professions/:profession", userController.getUserByProfession)
 userRouter.get("/:_id",userController.getUser)
+userRouter.get("/:_id/orders", auth, orderController.getUserOrders)
 userRouter.post("/new", userController.createUser)
 userRouter.post("/:_id/services/new", serviceController.createService)
 userRouter.get("/:userId/services", auth, serviceController.getMyServices)
