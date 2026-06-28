@@ -30,8 +30,8 @@ const orderSchema = new mongoose.Schema({
     },
     orderStatus:{
         type: String,
-        enum: ['in visionatura', 'in corso', 'completato', 'annullato'],
-        default: 'in visionatura'
+        enum: ['in corso', 'completato', 'annullato'],
+        default: 'in corso'
     },
     paymentStatus:{
         type: String,
