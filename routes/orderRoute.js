@@ -5,6 +5,7 @@ const orderRouter = express.Router();
 
 orderRouter.post("/checkout", auth, orderController.createOrder)
 orderRouter.post("/:_id/pay", auth, orderController.payOrder)
+orderRouter.get("/:_id/pdf", auth, orderController.downloadPdf)
 orderRouter.get("/:_id", auth, orderController.getOrder)
 orderRouter.patch("/:_id", auth, orderController.updateOrder)
 

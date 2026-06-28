@@ -23,6 +23,9 @@ const orderSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    serviceName:{
+        type: String
+    },
     orderDate:{
         type: Date,
         required: true,
@@ -35,7 +38,7 @@ const orderSchema = new mongoose.Schema({
     },
     paymentStatus:{
         type: String,
-        enum: ['da effettuare','effettuato', 'annullato'],
+        enum: ['da effettuare','effettuato', 'annullato', "rimborsato"],
         default: 'da effettuare'
     }
 
