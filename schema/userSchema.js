@@ -50,10 +50,7 @@ const userSchema =new mongoose.Schema({
         companyAddress: String,
         profession:{
             type: String,
-        },
-        dealerBalance: {
-            type:Number,
-            default: 0.0},
+        }
     },
     services:[{
         type: mongoose.Schema.Types.ObjectId,

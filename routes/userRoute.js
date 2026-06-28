@@ -9,7 +9,7 @@ const userRouter = express.Router()
 userRouter.post("/login", login)
 userRouter.get("/allusers", userController.getAllUsers)
 userRouter.get("/professions/:profession", userController.getUserByProfession)
-userRouter.get("/:_id/orders", auth, orderController.getUserOrders)
+userRouter.get("/:_id/orders/", auth, orderController.getUserOrders)
 userRouter.get("/:_id", userController.getUser)
 userRouter.post("/new", userController.createUser)
 userRouter.post("/:_id/services/new", serviceController.createService)
@@ -18,7 +18,7 @@ userRouter.patch("/:_id/services/:serviceId", auth, serviceController.updateServ
 userRouter.post("/:_id/services/:serviceId/comments/new", serviceController.addComment)
 userRouter.patch("/:_id/services/:serviceId/comments/:commentId", auth, serviceController.updateComment)
 userRouter.patch("/:_id", auth, userController.updateUser)
-userRouter.delete("/:_id", auth, userController.deleteUser)
+userRouter.delete("/:_id", auth, userController.deleteUser) 
 
 
 module.exports = userRouter;

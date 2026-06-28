@@ -4,12 +4,15 @@ const User = require('../schema/userSchema')
 
 module.exports = {
     createOrder: async function (req, res) {
-        const { serviceId } = req.body
-        const customerId = req.user.id
+        const {serviceId} = req.body
+        const  customerId = req.user.id
 
         try {
             const service = await Service.findById(serviceId)
             if (!service) return res.status(404).json({ message: "Servizio non trovato" })
+            if (customerId === service.dealer){
+                return res.status(403).json({message: "Non sei autorizzato"})
+            }
 
             const newOrder = new Order({
                 dealer: service.dealer,
@@ -50,20 +53,27 @@ module.exports = {
         }
     },
 
+   
+
     getUserOrders: async function (req, res) {
         const userId = req.user.id
-        const userRole = req.user.role
+        const type = req.query.type
 
         try {
-            if (userRole === 'dealer') {
-                const orders = await Order.find({ dealer: userId })
-                if (orders.length === 0) return res.status(404).json({ message: "Nessun ordine trovato" })
-                return res.status(200).json(orders)
+            let orders
+            if (type === 'received') {
+                orders = await Order.find({ dealer: userId })
+                    .populate("service", "name")
+                    .populate("customer", "name lastname")
             } else {
-                const orders = await Order.find({ customer: userId })
-                if (orders.length === 0) return res.status(404).json({ message: "Nessun ordine trovato" })
-                return res.status(200).json(orders)
+                orders = await Order.find({ customer: userId })
+                    .populate("service", "name")
+                    .populate("dealer", "name lastname")
             }
+
+            if (orders.length === 0) return res.status(404).json({ message: "Nessun ordine trovato" })
+            return res.status(200).json(orders)
+
         } catch (err) {
             return res.status(500).json({ message: "Errore interno del server", error: err.message })
         }
@@ -126,8 +136,7 @@ module.exports = {
             }
 
             customer.balance -= order.finalCost
-            dealer.dealerData.dealerBalance += order.finalCost
-            dealer.markModified('dealerData')
+            dealer.balance += order.finalCost
             order.paymentStatus = 'effettuato'
 
             await customer.save()
