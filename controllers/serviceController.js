@@ -64,16 +64,7 @@ module.exports = {
         const serviceId = req.params.serviceId
 
 
-        if (!service) {
-            return res.status(404).json({ message: "Servizio non trovato" })
-        }
 
-        if (!user) {
-            return res.status(404).json({ message: "Utente non trovato" })
-        }
-        if (userId === service.dealer.toString()) {
-            return res.status(401).json({ message: "Il dealer non può commentare un suo servizio" })
-        }
 
 
         try {
@@ -83,6 +74,16 @@ module.exports = {
 
             if (!user.orders.some(order => order.service.toString() === serviceId)) {
                 return res.status(403).json({ message: "Nessun ordine relativo a questo servizio" })
+            }
+            if (!service) {
+                return res.status(404).json({ message: "Servizio non trovato" })
+            }
+
+            if (!user) {
+                return res.status(404).json({ message: "Utente non trovato" })
+            }
+            if (userId === service.dealer.toString()) {
+                return res.status(401).json({ message: "Il dealer non può commentare un suo servizio" })
             }
 
             const comment = {

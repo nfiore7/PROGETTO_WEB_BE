@@ -19,6 +19,7 @@ userRouter.patch("/:_id/services/:serviceId", auth, serviceController.updateServ
 userRouter.delete("/:_id/services/:serviceId", auth, serviceController.deleteService)
 userRouter.post("/:_id/services/:serviceId/comments/new", serviceController.addComment)
 userRouter.patch("/:_id/services/:serviceId/comments/:commentId", auth, serviceController.updateComment)
+userRouter.delete("/:_id/services/:serviceId/comments/:commentId", auth,serviceController.deleteComment)
 userRouter.patch("/:_id", auth, userController.updateUser)
 userRouter.delete("/:_id", auth, userController.deleteUser) 
 
