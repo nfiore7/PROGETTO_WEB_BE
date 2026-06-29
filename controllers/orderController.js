@@ -257,7 +257,7 @@ module.exports = {
 
             doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke()
             doc.moveDown()
-            doc.fontSize(10).fillColor('gray').text('DoneDealer — Documento generato automaticamente', { align: 'center' })
+            doc.fontSize(10).fillColor('gray').text('DoneDeal — Documento generato automaticamente', { align: 'center' })
 
             // 9. Chiudo lo stream — Express invia la risposta
             doc.end()

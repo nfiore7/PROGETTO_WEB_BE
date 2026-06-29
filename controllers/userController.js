@@ -52,16 +52,6 @@ module.exports= {
         }
     },
 
-    getAllUsers: async function (req, res) {
-        try {
-             const users = await User.find().select("-password")
-                return res.status(200).json(users)
-            }
-        catch (err) {
-                res.status(500).json({message: "Qualcosa è andato storto" + err})
-        }
-    },
-
     getAllDealers: async function(req,res){
          try {
              const dealers = await User.find({role: 'dealer'}).select("-password")
@@ -85,19 +75,6 @@ module.exports= {
              return res.status(500).json({message: "Qualcosa è andato storto" + err})
          }
     },
-    getUserByProfession : async function(req,res){
-         const profession = req.params.profession.toUpperCase();
-         try{
-            const user = await User.find({"dealerData.profession": profession})
-             if(user.length ===0 ){
-                return res.status(404).json({message: "Nessun professionista trovato"});
-             }
-            return res.status(200).json(user);
-    }catch (err){
-             res.status(500).json({message: "Qualcosa è andato storto" + err})
-         }
-    },
-
 
     updateUser: async function (req,res){
         const id = req.params._id
@@ -141,7 +118,8 @@ module.exports= {
                 user.password = req.body.password
             }
             const newUser = await user.save()
-            res.status(200).json({message: "Utente modificato con successo", newUser})
+            const{password: _,...safeUser} = newUser.toObject()
+            res.status(200).json({message: "Utente modificato con successo", newUser: safeUser})
         }
      catch(err){ res.status(500).json({message: "Qualcosa è andato storto" + err})
         }
@@ -177,12 +155,17 @@ module.exports= {
 
     deleteUser: async function (req,res){
         const id = req.params._id
-        const user = await User.findById({_id: id})
-        if(!user){
-            return res.status(404).json({message: "Utente non trovato"})
+        try{
+            const user = await User.findById({_id: id})
+            if(!user){
+                return res.status(404).json({message: "Utente non trovato"})
+            }
+            await User.findByIdAndDelete(id)
+            return res.status(200).json({message: "Utente eliminato con successo"})
+        }catch(err){
+            return res.status(500).json({message: "Errore interno del server"})
         }
-        await User.findByIdAndDelete(id)
-        return res.status(200).json({message: "Utente eliminato con successo"})
+
     }
 
 

@@ -8,14 +8,15 @@ module.exports = {
         const data = req.body
         const id = req.params._id
 
-        const user = await User.findById(id)
-        if (!user) {
-            return res.status(404).json({ message: "Utente non trovato" })
-        }
-        if (user.role !== 'dealer') {
-            return res.status(403).json({ message: "L'utente non è un dealer" })
-        }
+
         try {
+            const user = await User.findById(id)
+            if (!user) {
+                return res.status(404).json({ message: "Utente non trovato" })
+            }
+            if (user.role !== 'dealer') {
+                return res.status(403).json({ message: "L'utente non è un dealer" })
+            }
             const newService = new Service({
                 name: data.name,
                 description: data.description,
@@ -34,18 +35,17 @@ module.exports = {
     updateService: async (req, res) => {
         const id = req.params._id
         const serviceId = req.params.serviceId
-
-        const user = await User.findById(id)
-        if (!user) {
-            return res.status(404).json({ message: "Utente non trovato" })
-        }
-
-        if (user.role !== 'dealer') {
-            return res.status(403).json({ message: "Utente non è un dealer" })
-        }
-
         const { ...updates } = req.body
+
         try {
+            const user = await User.findById(id)
+            if (!user) {
+                return res.status(404).json({ message: "Utente non trovato" })
+            }
+
+            if (user.role !== 'dealer') {
+                return res.status(403).json({ message: "Utente non è un dealer" })
+            }
             const service = await Service.findById(serviceId)
             if (!service) {
                 return res.status(404).json({ message: "Servizio non trovato" })
@@ -63,25 +63,20 @@ module.exports = {
         const userId = req.params._id
         const serviceId = req.params.serviceId
 
-
-
-
-
         try {
             const user = await User.findById({ _id: userId }).populate("orders", "service")
             const service = await Service.findById({ _id: serviceId })
 
-
-            if (!user.orders.some(order => order.service.toString() === serviceId)) {
-                return res.status(403).json({ message: "Nessun ordine relativo a questo servizio" })
+            if (!user) {
+                return res.status(404).json({ message: "Utente non trovato" })
             }
             if (!service) {
                 return res.status(404).json({ message: "Servizio non trovato" })
             }
-
-            if (!user) {
-                return res.status(404).json({ message: "Utente non trovato" })
+            if (!user.orders.some(order => order.service.toString() === serviceId)) {
+                return res.status(403).json({ message: "Nessun ordine relativo a questo servizio" })
             }
+
             if (userId === service.dealer.toString()) {
                 return res.status(403).json({ message: "Il dealer non può commentare un suo servizio" })
             }
@@ -127,9 +122,9 @@ module.exports = {
         const serviceId = req.params.serviceId;
 
         try {
-            service = await Service.findById(serviceId)
+            const service = await Service.findById(serviceId)
                 .populate("comments.user", "username")
-                .populate("dealer", "username");
+                .populate("dealer", "username name lastname city");
             if (!service) {
                 return res.status(404).json({ message: "Servizio non trovato" })
             }
@@ -160,20 +155,6 @@ module.exports = {
 
     },
 
-
-    getComments: async function (req, res) {
-        const serviceId = req.params.serviceId
-
-        try {
-            const service = await Service.findById(serviceId)
-            if(!service) return res.status(404).json({ message: "Servizio non trovato" })
-
-            return res.status(200).json(comments);
-        }
-        catch (err) {
-            return res.status(500).json({ message: "Qualcosa è andato storto" + err.message })
-        }
-    },
     deleteService: async (req, res) => {
         const userId = req.params._id;
         const serviceId = req.params.serviceId;

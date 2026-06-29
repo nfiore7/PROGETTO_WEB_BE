@@ -8,8 +8,6 @@ const userRouter = express.Router()
 
 userRouter.post("/login", login)
 userRouter.post("/refresh", userController.refreshToken)
-userRouter.get("/allusers", userController.getAllUsers)
-userRouter.get("/professions/:profession", userController.getUserByProfession)
 userRouter.get("/:_id/orders/", auth, orderController.getUserOrders)
 userRouter.get("/:_id", userController.getUser)
 userRouter.post("/new", userController.createUser)
