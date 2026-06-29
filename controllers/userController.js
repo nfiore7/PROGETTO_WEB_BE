@@ -48,6 +48,13 @@ module.exports= {
             res.setHeader("Authorization", `Bearer ${accessToken}`)
             return res.status(201).json({ message: "Utente registrato", refreshToken })
         } catch (err) {
+            if (err.name === 'ValidationError') {
+                const firstError = Object.values(err.errors)[0]
+                if (firstError.kind === 'minlength' && firstError.path === 'password') {
+                    return res.status(400).json({ message: `La password deve essere di almeno ${firstError.properties.minlength} caratteri` })
+                }
+                return res.status(400).json({ message: firstError.message })
+            }
             return res.status(500).json({message: "Qualcosa è andato storto" + err.message})
         }
     },
