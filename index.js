@@ -36,4 +36,3 @@ app.use("/users", userRouter)
 app.use("/services", serviceRouter)
 app.use("/orders", orderRouter)
 app.get("/dealers",userController.getAllDealers)
-//ghudswxhguwsxdxshgwdu
