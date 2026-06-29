@@ -1,6 +1,7 @@
 const Order = require('../schema/orderSchema')
 const Service = require('../schema/serviceSchema')
 const User = require('../schema/userSchema')
+const path = require('path')
 
 module.exports = {
     createOrder: async function (req, res) {
@@ -210,6 +211,10 @@ module.exports = {
             doc.pipe(res)
 
             // 8. Contenuto del PDF
+            // Logo in alto a destra
+            const logoPath = path.join(__dirname, '../assets/logo.png')
+            doc.image(logoPath, doc.page.width - 110, 30, { width: 60 })
+
             doc.fontSize(22).font('Helvetica-Bold').text('DealDone', { align: 'center' })
             doc.fontSize(11).font('Helvetica').fillColor('gray').text('Ricevuta di pagamento', { align: 'center' })
             doc.moveDown(2)
