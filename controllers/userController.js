@@ -48,7 +48,7 @@ module.exports= {
             res.setHeader("Authorization", `Bearer ${accessToken}`)
             return res.status(201).json({ message: "Utente registrato", refreshToken })
         } catch (err) {
-            return res.status(500).json({message: "Qualcosa è andato storto" + err})
+            return res.status(500).json({message: "Qualcosa è andato storto" + err.message})
         }
     },
 
@@ -58,7 +58,7 @@ module.exports= {
              return res.status(200).json(dealers)
          }
          catch (err) {
-             res.status(500).json({message: "Qualcosa è andato storto" + err})
+             res.status(500).json({message: "Qualcosa è andato storto" + err.message})
          }
     },
 
@@ -72,12 +72,15 @@ module.exports= {
              return res.status(200).json(user);
          }
          catch(err){
-             return res.status(500).json({message: "Qualcosa è andato storto" + err})
+             return res.status(500).json({message: "Qualcosa è andato storto" + err.message})
          }
     },
 
     updateUser: async function (req,res){
         const id = req.params._id
+        if(req.user.id !== id){
+            return res.status(403).json({message: "Utente non autorizzato"})
+        }
         const {password,balance, ...updates} = req.body;
 
         try {
@@ -121,7 +124,7 @@ module.exports= {
             const{password: _,...safeUser} = newUser.toObject()
             res.status(200).json({message: "Utente modificato con successo", newUser: safeUser})
         }
-     catch(err){ res.status(500).json({message: "Qualcosa è andato storto" + err})
+     catch(err){ res.status(500).json({message: "Qualcosa è andato storto" + err.message})
         }
     },
 
@@ -155,10 +158,49 @@ module.exports= {
 
     deleteUser: async function (req,res){
         const id = req.params._id
+        if(req.user.id !== id){
+            return res.status(403).json({message: "Utente non autorizzato"})
+        }
         try{
+
             const user = await User.findById({_id: id})
             if(!user){
                 return res.status(404).json({message: "Utente non trovato"})
+            }
+            if(user.role === 'dealer'){
+                const services = await Service.find({dealer: id})
+                const servicesIds = services.map(service => service.id)
+
+                const activeOrders = await Order.find({
+                    service:{$in: servicesIds},
+                    orderStatus:"in corso"
+                })
+                for(const order of activeOrders){
+                    if(order.paymentStatus === "effettuato"){
+                        const customer = await User.findById(order.customer)
+                        if(customer){
+                            customer.balance += order.finalCost
+                            await customer.save()
+                        }
+                        order.paymentStatus = "rimborsato"
+                    }
+                    order.orderStatus = "annullato"
+                    await order.save()
+                }
+
+                await Service.deleteMany({dealer: id})
+
+            }
+            if(user.role === 'customer'){
+                const pendingOrders = await Order.find({
+                    customer: id,
+                    orderStatus:"in corso",
+                    paymentStatus:"da effettuare"
+                })
+                for(const order of pendingOrders){
+                    order.orderStatus = "annullato"
+                    await order.save()
+                }
             }
             await User.findByIdAndDelete(id)
             return res.status(200).json({message: "Utente eliminato con successo"})

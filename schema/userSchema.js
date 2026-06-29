@@ -10,6 +10,7 @@ const userSchema =new mongoose.Schema({
     password:{
         type: String,
         required: true,
+        minlength: 5,
     },
     name:{
         type: String,
@@ -35,7 +36,7 @@ const userSchema =new mongoose.Schema({
     },
     role:{
         type: String,
-        enum: ['admin', 'customer', 'dealer'],
+        enum: ['customer', 'dealer'],
         default: "customer",
         required: true
     },
@@ -72,9 +73,5 @@ userSchema.pre("save", async function() {
     }
 })
 
-userSchema.methods.comparePassword = async function(candidatePassword){
-    return bcrypt.compare(candidatePassword, this.password);
-
-}
 
 module.exports = mongoose.model('Users',userSchema);

@@ -6,10 +6,8 @@ const express = require("express")
 const userRouter = require("./routes/userRoute")
 const serviceRouter = require("./routes/serviceRoute")
 const orderRouter = require("./routes/orderRoute")
-const serviceController = require("./controllers/serviceController");
 const cors = require("cors")
 const userController = require("./controllers/userController");
-const orderController = require("./controllers/orderController");
 
 
 

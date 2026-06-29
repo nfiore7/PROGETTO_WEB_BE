@@ -13,7 +13,11 @@ const serviceSchema = new mongoose.Schema({
         required: true,
     },
 
-    cost: Number,
+    cost: {
+        type: Number,
+        min: 0,
+        default: 0,
+    },
 
     dealer:{
         type: mongoose.Schema.Types.ObjectId, ref: 'Users',
