@@ -1,6 +1,7 @@
 const express = require('express')
 const User = require('../schema/userSchema')
 const jwt = require('jsonwebtoken')
+const Service = require("mongoose/lib/model");
 
 
 module.exports= {
@@ -113,6 +114,31 @@ module.exports= {
         try {
             const user = await User.findById({_id: id})
             if (!user) {return res.status(404).json({message: "Utente non trovato"})}
+            if(user.role === 'dealer' && updates.role === 'customer'){
+                const services = await Service.find({dealer: id})
+                const servicesIds = services.map(service => service.id)
+
+                const activeOrders = await Order.find({
+                    service:{$in: servicesIds},
+                    orderStatus:"in corso"
+                })
+                for(const order of activeOrders){
+                    if(order.paymentStatus === "effettuato"){
+                        const customer = await User.findById(order.customer)
+                        if(customer){
+                            customer.balance += order.finalCost
+                            await customer.save()
+                        }
+                        order.paymentStatus = "rimborsato"
+                    }
+                    order.orderStatus = "annullato"
+                    await order.save()
+                }
+                await Service.deleteMany({dealer: id})
+                updates.services=[]
+                updates.dealerData=null
+            }
+
             user.set(updates)
 
             if(balance){

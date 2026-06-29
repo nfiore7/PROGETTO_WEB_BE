@@ -155,7 +155,7 @@ module.exports = {
         try {
             const services = await Service.find({ dealer: userId })
             if (services.length === 0) {
-                res.status(404).json({ message: "Nessun servizio trovato" })
+                return res.status(404).json({ message: "Nessun servizio trovato" })
             }
             res.status(200).json(services)
         } catch (err) {
