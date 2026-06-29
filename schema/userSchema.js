@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const bcrypt = require("bcrypt");
-const { ref } = require('pdfkit');
 
 const userSchema =new mongoose.Schema({
     username: {
@@ -65,8 +64,7 @@ const userSchema =new mongoose.Schema({
 userSchema.pre("save", async function() {
     if (!this.isModified("password")) return ;
     try {
-        let user = this
-        hash = await bcrypt.hash(user.password, 10)
+        hash = await bcrypt.hash(this.password, 10)
         this.password = hash
 
     }catch(err){

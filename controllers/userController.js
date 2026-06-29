@@ -12,6 +12,10 @@ module.exports= {
             if(existingUser) {
                 return res.status(409).json({message: "Utente gia registrato"})
             }
+            const existingUsername = await User.findOne({username: data.username})
+            if(existingUsername) {
+                return res.status(409).json({message: "Username già in uso"})
+            }
 
                 
             const newUser = new User({
@@ -24,10 +28,8 @@ module.exports= {
                 age: data.age,
                 email: data.email,
                 phone: data.phone,
-                balance: data.balance,
                 role: data.role || 'customer',
                 dealerData: data.dealerData,
-                services: data.services,
             });
             
             await newUser.save()
@@ -52,13 +54,8 @@ module.exports= {
 
     getAllUsers: async function (req, res) {
         try {
-             const users = await User.find()
-                if(users.length !==0) { 
-                    res.status(200).json(users)
-                }
-                else {
-                res.status(404).json({message: "Nessun utente trovato "})
-                }
+             const users = await User.find().select("-password")
+                return res.status(200).json(users)
             }
         catch (err) {
                 res.status(500).json({message: "Qualcosa è andato storto" + err})
@@ -67,13 +64,8 @@ module.exports= {
 
     getAllDealers: async function(req,res){
          try {
-             const dealers = await User.find({role: 'dealer'})
-             if(dealers.length) {
-                res.status(200).json(dealers)
-            }
-              else {
-                res.status(404).json({message: "Nessun fornitore trovato"})
-            }
+             const dealers = await User.find({role: 'dealer'}).select("-password")
+             return res.status(200).json(dealers)
          }
          catch (err) {
              res.status(500).json({message: "Qualcosa è andato storto" + err})
@@ -83,7 +75,7 @@ module.exports= {
     getUser : async function(req,res){
         const id = req.params._id
         try{
-         const user = await User.findById({_id: id})
+         const user = await User.findById({_id: id}).select("-password")
              if(!user){
                 return res.status(404).json({message: "Utente inesistente"});
                 }

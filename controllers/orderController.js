@@ -11,7 +11,7 @@ module.exports = {
         try {
             const service = await Service.findById(serviceId)
             if (!service) return res.status(404).json({ message: "Servizio non trovato" })
-            if (customerId === service.dealer) {
+            if (customerId === service.dealer.toString()) {
                 return res.status(403).json({ message: "Non sei autorizzato" })
             }
 
@@ -76,7 +76,6 @@ module.exports = {
                     .populate("dealer", "name lastname")
             }
 
-            if (orders.length === 0) return res.status(404).json({ message: "Nessun ordine trovato" })
             return res.status(200).json(orders)
 
         } catch (err) {
@@ -93,16 +92,25 @@ module.exports = {
             const order = await Order.findById(orderId)
             if (!order) return res.status(404).json({ message: "Ordine non trovato" })
 
+            if(userRole === "dealer" && order.dealer.toString() !== userId) {
+                return res.status(403).json({ message: "Non sei autorizzato" })
+            }
+
             if (userRole === 'dealer') {
                 const { orderStatus } = req.body
 
-                if (orderStatus === "completato" && order.paymentStatus === "effettuato") {
-                    const dealer = await User.findById(order.dealer)
-                    if (!dealer)
-                        return res.status(404).json({ message: "Dealer non trovato" })
+                if (orderStatus === "completato") {
+                    if(order.orderStatus === "completato") {
+                        return res.status(400).json({message: "Ordine già completato" })
+                    }
+                    if(order.paymentStatus === "effettuato") {
+                        const dealer = await User.findById(order.dealer)
+                        if (!dealer)
+                            return res.status(404).json({ message: "Dealer non trovato" })
 
-                    dealer.balance += order.finalCost
-                    await dealer.save()
+                        dealer.balance += order.finalCost
+                        await dealer.save()
+                    }
                 }
 
                 if (orderStatus === "annullato" && order.paymentStatus === "effettuato") {
@@ -118,8 +126,7 @@ module.exports = {
                 order.orderStatus = orderStatus
 
             } else {
-                const { paymentStatus } = req.body
-                order.paymentStatus = paymentStatus
+                return res.status(403).json({ message: "Non autorizzato" })
 
             }
 
@@ -215,7 +222,7 @@ module.exports = {
             const logoPath = path.join(__dirname, '../assets/logo.png')
             doc.image(logoPath, doc.page.width - 110, 30, { width: 60 })
 
-            doc.fontSize(22).font('Helvetica-Bold').text('DealDone', { align: 'center' })
+            doc.fontSize(22).font('Helvetica-Bold').text('DoneDeal', { align: 'center' })
             doc.fontSize(11).font('Helvetica').fillColor('gray').text('Ricevuta di pagamento', { align: 'center' })
             doc.moveDown(2)
 
@@ -250,7 +257,7 @@ module.exports = {
 
             doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke()
             doc.moveDown()
-            doc.fontSize(10).fillColor('gray').text('DealDone — Documento generato automaticamente', { align: 'center' })
+            doc.fontSize(10).fillColor('gray').text('DoneDealer — Documento generato automaticamente', { align: 'center' })
 
             // 9. Chiudo lo stream — Express invia la risposta
             doc.end()

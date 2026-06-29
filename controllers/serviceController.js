@@ -83,7 +83,7 @@ module.exports = {
                 return res.status(404).json({ message: "Utente non trovato" })
             }
             if (userId === service.dealer.toString()) {
-                return res.status(401).json({ message: "Il dealer non può commentare un suo servizio" })
+                return res.status(403).json({ message: "Il dealer non può commentare un suo servizio" })
             }
 
             const comment = {
@@ -142,7 +142,6 @@ module.exports = {
     getAllServices: async function (req, res) {
         try {
             const services = await Service.find().populate("dealer", "name lastname username city")
-            if (!services.length) return res.status(404).json({ message: "Nessun servizio trovato" })
             return res.status(200).json(services)
         } catch (err) {
             res.status(500).json({ message: "Errore interno del server" })
@@ -154,10 +153,7 @@ module.exports = {
         const userId = req.params.userId;
         try {
             const services = await Service.find({ dealer: userId })
-            if (services.length === 0) {
-                return res.status(404).json({ message: "Nessun servizio trovato" })
-            }
-            res.status(200).json(services)
+            return res.status(200).json(services)
         } catch (err) {
             res.status(500).json({ message: "Errore interno del server" })
         }
@@ -170,10 +166,8 @@ module.exports = {
 
         try {
             const service = await Service.findById(serviceId)
-            const comments = service.comments
-            if (comments.length === 0) {
-                return res.status(404).json({ message: "Commento inesistente" });
-            }
+            if(!service) return res.status(404).json({ message: "Servizio non trovato" })
+
             return res.status(200).json(comments);
         }
         catch (err) {
