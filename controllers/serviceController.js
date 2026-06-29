@@ -1,7 +1,6 @@
-const express = require("express")
+
 const Service = require("../schema/serviceSchema")
 const User = require("../schema/userSchema")
-const userController = require("./userController")
 
 module.exports = {
     createService: async (req, res) => {
@@ -73,7 +72,7 @@ module.exports = {
             if (!service) {
                 return res.status(404).json({ message: "Servizio non trovato" })
             }
-            if (!user.orders.some(order => order.service.toString() === serviceId)) {
+            if (!user.orders.some(order => order.service?.toString() === serviceId)) {
                 return res.status(403).json({ message: "Nessun ordine relativo a questo servizio" })
             }
 
