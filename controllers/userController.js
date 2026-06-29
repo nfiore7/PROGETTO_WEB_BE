@@ -1,8 +1,8 @@
 const express = require('express')
 const User = require('../schema/userSchema')
 const jwt = require('jsonwebtoken')
-const Service = require("mongoose/lib/model");
-
+const Service = require("../schema/serviceSchema");
+const Order = require("../schema/orderSchema");
 
 module.exports= {
      createUser: async function (req, res) {
