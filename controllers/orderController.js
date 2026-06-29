@@ -17,7 +17,7 @@ module.exports = {
 
             const newOrder = new Order({
                 dealer: service.dealer,
-                customer: customerId,gogi
+                customer: customerId,
                 service: serviceId,
                 finalCost: service.cost,
                 serviceName: service.name
