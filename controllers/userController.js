@@ -30,20 +30,20 @@ module.exports= {
             });
             
             await newUser.save()
-            const token = jwt.sign(
-                {
-                    id: newUser._id,
-                    role: newUser.role,
-                    name: newUser.name,
-                    lastname: newUser.lastname,
-                    username: newUser.username,
-                },
-                process.env.JWT_SECRET,
-                {expiresIn: '24h'}
-            )
-            res.setHeader("Authorization", `Bearer ${token}`);
-            
-            return res.status(201).json({message: "Utente registrato"})
+
+            const payload = {
+                id: newUser._id,
+                role: newUser.role,
+                name: newUser.name,
+                lastname: newUser.lastname,
+                username: newUser.username,
+            }
+
+            const accessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' })
+            const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' })
+
+            res.setHeader("Authorization", `Bearer ${accessToken}`)
+            return res.status(201).json({ message: "Utente registrato", refreshToken })
         } catch (err) {
             return res.status(500).json({message: "Qualcosa è andato storto" + err})
         }
@@ -108,13 +108,16 @@ module.exports= {
 
     updateUser: async function (req,res){
         const id = req.params._id
-        const {password, ...updates} = req.body;
+        const {password,balance, ...updates} = req.body;
 
         try {
             const user = await User.findById({_id: id})
             if (!user) {return res.status(404).json({message: "Utente non trovato"})}
             user.set(updates)
 
+            if(balance){
+                user.balance +=balance
+            }
 
             if(password){
                 user.password = req.body.password
@@ -123,6 +126,34 @@ module.exports= {
             res.status(200).json({message: "Utente modificato con successo", newUser})
         }
      catch(err){ res.status(500).json({message: "Qualcosa è andato storto" + err})
+        }
+    },
+
+    refreshToken: async function (req, res) {
+        const { refreshToken } = req.body
+        if (!refreshToken) return res.status(401).json({ message: "Refresh token mancante" })
+
+        try {
+            // Verifica firma e scadenza con il segreto dedicato al refresh
+            const payload = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
+
+            // Emette solo il nuovo access token — il refresh token rimane lo stesso
+            const accessToken = jwt.sign(
+                {
+                    id: payload.id,
+                    role: payload.role,
+                    name: payload.name,
+                    lastname: payload.lastname,
+                    username: payload.username,
+                },
+                process.env.JWT_SECRET,
+                { expiresIn: '1h' }
+            )
+
+            return res.status(200).json({ accessToken })
+        } catch (err) {
+            // Token scaduto o firma non valida
+            return res.status(403).json({ message: "Refresh token non valido o scaduto" })
         }
     },
 

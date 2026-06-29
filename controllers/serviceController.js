@@ -62,8 +62,6 @@ module.exports = {
         const data = req.body
         const userId = req.params._id
         const serviceId = req.params.serviceId
-        const user = await User.findById({ _id: userId })
-        const service = await Service.findById({ _id: serviceId })
 
 
         if (!service) {
@@ -79,6 +77,14 @@ module.exports = {
 
 
         try {
+            const user = await User.findById({ _id: userId }).populate("orders", "service")
+            const service = await Service.findById({ _id: serviceId })
+
+
+            if (!user.orders.some(order => order.service.toString() === serviceId)) {
+                return res.status(403).json({ message: "Nessun ordine relativo a questo servizio" })
+            }
+
             const comment = {
                 user: userId,
                 comment: data.comments.comment,

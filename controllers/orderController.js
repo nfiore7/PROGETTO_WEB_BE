@@ -23,6 +23,9 @@ module.exports = {
             })
 
             await newOrder.save()
+            const customer = await User.findById(customerId)
+            customer.orders.push(newOrder._id)
+            await customer.save()
             return res.status(201).json({ message: "Ordine creato con successo", order: newOrder })
 
         } catch (err) {
@@ -92,19 +95,23 @@ module.exports = {
             if (userRole === 'dealer') {
                 const { orderStatus } = req.body
 
+                if (orderStatus === "completato" && order.paymentStatus === "effettuato") {
+                    const dealer = await User.findById(order.dealer)
+                    if (!dealer)
+                        return res.status(404).json({ message: "Dealer non trovato" })
+
+                    dealer.balance += order.finalCost
+                    await dealer.save()
+                }
+
                 if (orderStatus === "annullato" && order.paymentStatus === "effettuato") {
                     const customer = await User.findById(order.customer)
-                    const dealer = await User.findById(order.dealer)
-                    if (!customer || !dealer)
-                        return res.status(404).json({ message: "Utente non trovato" })
+                    if (!customer)
+                        return res.status(404).json({ message: "Cliente non trovato" })
 
                     customer.balance += order.finalCost
-                    dealer.dealerData.dealerBalance -= order.finalCost
-                    dealer.markModified("dealerData")
                     order.paymentStatus = "rimborsato"
-
                     await customer.save()
-                    await dealer.save()
                 }
 
                 order.orderStatus = orderStatus
@@ -142,9 +149,7 @@ module.exports = {
             }
 
             const customer = await User.findById(order.customer)
-            const dealer = await User.findById(order.dealer)
-
-            if (!customer || !dealer) {
+            if (!customer) {
                 return res.status(404).json({ message: "Utente non trovato" })
             }
 
@@ -153,12 +158,9 @@ module.exports = {
             }
 
             customer.balance -= order.finalCost
-            dealer.dealerData.dealerBalance += order.finalCost
-            dealer.markModified('dealerData')
             order.paymentStatus = 'effettuato'
 
             await customer.save()
-            await dealer.save()
             await order.save()
 
             return res.status(200).json({

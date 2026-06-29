@@ -1,7 +1,6 @@
-/**Qui modelliamo lo schema dei vari utenti i quali possono essere sia clienti che fornitori */
-
 const mongoose = require('mongoose');
-const bcrypt = require("bcrypt")
+const bcrypt = require("bcrypt");
+const { ref } = require('pdfkit');
 
 const userSchema =new mongoose.Schema({
     username: {
@@ -55,6 +54,10 @@ const userSchema =new mongoose.Schema({
     services:[{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Services',
+    }],
+    orders:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Orders"
     }],
     },{timestamps:true}
 )

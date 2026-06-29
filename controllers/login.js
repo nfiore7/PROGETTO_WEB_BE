@@ -15,21 +15,19 @@ async function login (req, res) {
             return res.status(401).json({message: "Username o password errati"})
         }
 
-        const token = jwt.sign(
-            {
-                id: user._id,
-                role: user.role,
-                name: user.name,
-                lastname: user.lastname,
-                username: user.username,
+        const payload = {
+            id: user._id,
+            role: user.role,
+            name: user.name,
+            lastname: user.lastname,
+            username: user.username,
+        }
 
-            },
-            process.env.JWT_SECRET,
-            {expiresIn: '24h'}
-        )
-        res.setHeader("Authorization", `Bearer ${token}`);
+        const accessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' })
+        const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' })
 
-        return res.status(200).json({message: "Loggin effettuato con sucesso"})
+        res.setHeader("Authorization", `Bearer ${accessToken}`)
+        return res.status(200).json({ message: "Login effettuato con successo", refreshToken })
     }catch(err){
         return res.status(500).json({message: "Errore interno del server" + err.message})
     }
