@@ -17,7 +17,7 @@ module.exports = {
 
             const newOrder = new Order({
                 dealer: service.dealer,
-                customer: customerId,
+                customer: customerId,gogi
                 service: serviceId,
                 finalCost: service.cost,
                 serviceName: service.name
@@ -190,7 +190,7 @@ module.exports = {
             // 1. Recupero ordine con tutti i dati necessari
             const order = await Order.findById(orderId)
                 .populate("service", "name cost")
-                .populate("dealer", "name lastname username")
+                .populate("dealer", "name lastname username city address")
                 .populate("customer", "name lastname username")
 
             // 2. Ordine esiste?
@@ -247,6 +247,8 @@ module.exports = {
             doc.font('Helvetica').moveDown(0.5)
             doc.text(`Nome:             ${order.dealer?.name} ${order.dealer?.lastname}`)
             doc.text(`Username:         ${order.dealer?.username}`)
+            doc.text(`Città:            ${order.dealer?.city || '—'}`)
+            doc.text(`Indirizzo:        ${order.dealer?.address || '—'}`)
             doc.moveDown()
 
             doc.font('Helvetica-Bold').text('Cliente')
