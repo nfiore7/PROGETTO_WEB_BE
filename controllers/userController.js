@@ -6,6 +6,31 @@ const bcrypt = require("bcrypt");
 const generateTokens = require("../utils/generateTokens");
 
 
+async function cancelDealerOrders(dealerId) {
+    const services = await Service.find({ dealer: dealerId })
+    const servicesIds = services.map(service => service.id)
+
+    const activeOrders = await Order.find({
+        service: { $in: servicesIds },
+        orderStatus: "in corso"
+    })
+
+    for (const order of activeOrders) {
+        if (order.paymentStatus === "effettuato") {
+            const customer = await User.findById(order.customer)
+            if (customer) {
+                customer.balance += order.finalCost
+                await customer.save()
+            }
+            order.paymentStatus = "rimborsato"
+        }
+        order.orderStatus = "annullato"
+        await order.save()
+    }
+
+    await Service.deleteMany({ dealer: dealerId })
+}
+
 module.exports= {
      createUser: async function (req, res) {
         const data = req.body;
@@ -95,28 +120,9 @@ module.exports= {
             const user = await User.findById({_id: id})
             if (!user) {return res.status(404).json({message: "Utente non trovato"})}
             if(user.role === 'dealer' && updates.role === 'customer'){
-                const services = await Service.find({dealer: id})
-                const servicesIds = services.map(service => service.id)
-
-                const activeOrders = await Order.find({
-                    service:{$in: servicesIds},
-                    orderStatus:"in corso"
-                })
-                for(const order of activeOrders){
-                    if(order.paymentStatus === "effettuato"){
-                        const customer = await User.findById(order.customer)
-                        if(customer){
-                            customer.balance += order.finalCost
-                            await customer.save()
-                        }
-                        order.paymentStatus = "rimborsato"
-                    }
-                    order.orderStatus = "annullato"
-                    await order.save()
-                }
-                await Service.deleteMany({dealer: id})
-                updates.services=[]
-                updates.dealerData=null
+                await cancelDealerOrders(id)
+                updates.services = []
+                updates.dealerData = null
             }
 
             user.set(updates)
@@ -160,28 +166,7 @@ module.exports= {
                 return res.status(404).json({message: "Utente non trovato"})
             }
             if(user.role === 'dealer'){
-                const services = await Service.find({dealer: id})
-                const servicesIds = services.map(service => service.id)
-
-                const activeOrders = await Order.find({
-                    service:{$in: servicesIds},
-                    orderStatus:"in corso"
-                })
-                for(const order of activeOrders){
-                    if(order.paymentStatus === "effettuato"){
-                        const customer = await User.findById(order.customer)
-                        if(customer){
-                            customer.balance += order.finalCost
-                            await customer.save()
-                        }
-                        order.paymentStatus = "rimborsato"
-                    }
-                    order.orderStatus = "annullato"
-                    await order.save()
-                }
-
-                await Service.deleteMany({dealer: id})
-
+                await cancelDealerOrders(id)
             }
             if(user.role === 'customer'){
                 const pendingOrders = await Order.find({
