@@ -3,6 +3,8 @@ const User = require('../schema/userSchema')
 const jwt = require('jsonwebtoken')
 const Service = require("../schema/serviceSchema");
 const Order = require("../schema/orderSchema");
+const bcrypt = require("bcrypt");
+
 
 module.exports= {
      createUser: async function (req, res) {
@@ -88,7 +90,7 @@ module.exports= {
         if(req.user.id !== id){
             return res.status(403).json({message: "Utente non autorizzato"})
         }
-        const {password,balance, ...updates} = req.body;
+        const {oldPassword,newPassword,balance, ...updates} = req.body;
 
         try {
             const user = await User.findById({_id: id})
@@ -124,14 +126,26 @@ module.exports= {
                 user.balance +=balance
             }
 
-            if(password){
-                user.password = req.body.password
+            if (oldPassword && newPassword) {
+                const match = await bcrypt.compare(oldPassword, user.password)
+                if (!match) {
+                    return res.status(400).json({ message: "La vecchia password non è corretta" })
+                }
+                user.password = newPassword
             }
+
             const newUser = await user.save()
             const{password: _,...safeUser} = newUser.toObject()
             res.status(200).json({message: "Utente modificato con successo", newUser: safeUser})
-        }
-     catch(err){ res.status(500).json({message: "Qualcosa è andato storto" + err.message})
+        }catch(err) {
+             if (err.name === 'ValidationError') {
+                 const firstError = Object.values(err.errors)[0]
+                 if (firstError.kind === 'minlength' && firstError.path === 'password') {
+                     return res.status(400).json({message: `La nuova password deve essere di almeno ${firstError.properties.minlength} caratteri`})
+                 }
+                 return res.status(400).json({message: firstError.message})
+             }
+             return res.status(500).json({message: "Qualcosa è andato storto: " + err.message})
         }
     },
 
