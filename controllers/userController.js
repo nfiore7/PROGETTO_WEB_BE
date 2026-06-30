@@ -167,7 +167,7 @@ module.exports= {
                     username: payload.username,
                 },
                 process.env.JWT_SECRET,
-                { expiresIn: '1h' }
+                { expiresIn: '1m' }
             )
 
             return res.status(200).json({ accessToken })

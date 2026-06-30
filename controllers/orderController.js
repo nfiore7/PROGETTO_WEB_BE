@@ -3,6 +3,11 @@ const Service = require('../schema/serviceSchema')
 const User = require('../schema/userSchema')
 const path = require('path')
 
+/*
+    Qui ci sono tutte le API CRUD riguardante gli ordini
+ */
+
+
 module.exports = {
     createOrder: async function (req, res) {
         const { serviceId } = req.body
