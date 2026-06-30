@@ -1,9 +1,9 @@
 
 const User = require('../schema/userSchema')
-const jwt = require('jsonwebtoken')
 const Service = require("../schema/serviceSchema");
 const Order = require("../schema/orderSchema");
 const bcrypt = require("bcrypt");
+const generateTokens = require("../utils/generateTokens");
 
 
 module.exports= {
@@ -44,8 +44,7 @@ module.exports= {
                 username: newUser.username,
             }
 
-            const accessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' })
-            const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' })
+            const {accessToken, refreshToken} = generateTokens(payload)
 
             res.setHeader("Authorization", `Bearer ${accessToken}`)
             return res.status(201).json({ message: "Utente registrato", refreshToken })
@@ -146,34 +145,6 @@ module.exports= {
                  return res.status(400).json({message: firstError.message})
              }
              return res.status(500).json({message: "Qualcosa è andato storto: " + err.message})
-        }
-    },
-
-    refreshToken: async function (req, res) {
-        const { refreshToken } = req.body
-        if (!refreshToken) return res.status(401).json({ message: "Refresh token mancante" })
-
-        try {
-            // Verifica firma e scadenza con il segreto dedicato al refresh
-            const payload = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
-
-            // Emette solo il nuovo access token — il refresh token rimane lo stesso
-            const accessToken = jwt.sign(
-                {
-                    id: payload.id,
-                    role: payload.role,
-                    name: payload.name,
-                    lastname: payload.lastname,
-                    username: payload.username,
-                },
-                process.env.JWT_SECRET,
-                { expiresIn: '1m' }
-            )
-
-            return res.status(200).json({ accessToken })
-        } catch (err) {
-            // Token scaduto o firma non valida
-            return res.status(403).json({ message: "Refresh token non valido o scaduto" })
         }
     },
 

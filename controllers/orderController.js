@@ -2,6 +2,7 @@ const Order = require('../schema/orderSchema')
 const Service = require('../schema/serviceSchema')
 const User = require('../schema/userSchema')
 const path = require('path')
+const PDFDocument = require('pdfkit')
 
 /*
     Qui ci sono tutte le API CRUD riguardante gli ordini
@@ -187,43 +188,41 @@ module.exports = {
         }
     },
 
+    /*
+        Date le richeste del profetto, questa è una api BE esterna inclusa nella libreria
+        esterna pdfkit
+     */
+
     downloadPdf: async function (req, res) {
         const orderId = req.params._id
         const userId = req.user.id
 
         try {
-            // 1. Recupero ordine con tutti i dati necessari
             const order = await Order.findById(orderId)
                 .populate("service", "name cost")
                 .populate("dealer", "name lastname username city address")
                 .populate("customer", "name lastname username")
 
-            // 2. Ordine esiste?
             if (!order) return res.status(404).json({ message: "Ordine non trovato" })
 
-            // 3. Solo il customer può scaricare la sua ricevuta
             if (order.customer._id.toString() !== userId) {
                 return res.status(403).json({ message: "Non autorizzato" })
             }
 
-            // 4. Solo se pagato
             if (order.paymentStatus !== 'effettuato') {
                 return res.status(403).json({ message: "Ricevuta disponibile solo dopo il pagamento" })
             }
 
-            // 5. Genero il PDF in memoria con pdfkit
-            const PDFDocument = require('pdfkit')
+
             const doc = new PDFDocument({ margin: 50 })
 
-            // 6. Dico al browser che la risposta è un PDF da scaricare
             res.setHeader('Content-Type', 'application/pdf')
             res.setHeader('Content-Disposition', `attachment; filename="ricevuta-${order._id}.pdf"`)
 
-            // 7. Collego lo stream del PDF alla risposta HTTP
+            // Collego lo stream del PDF alla risposta HTTP
             doc.pipe(res)
 
-            // 8. Contenuto del PDF
-            // Logo in alto a destra
+
             const logoPath = path.join(__dirname, '../assets/logo.png')
             doc.image(logoPath, doc.page.width - 110, 30, { width: 60 })
 
@@ -266,7 +265,6 @@ module.exports = {
             doc.moveDown()
             doc.fontSize(10).fillColor('gray').text('DoneDeal — Documento generato automaticamente', { align: 'center' })
 
-            // 9. Chiudo lo stream — Express invia la risposta
             doc.end()
 
         } catch (err) {

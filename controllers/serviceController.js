@@ -2,6 +2,10 @@
 const Service = require("../schema/serviceSchema")
 const User = require("../schema/userSchema")
 
+/*
+    API CRUD per i servizi
+ */
+
 module.exports = {
     createService: async (req, res) => {
         const data = req.body
@@ -13,15 +17,22 @@ module.exports = {
             if (!user) {
                 return res.status(404).json({ message: "Utente non trovato" })
             }
+
+            if(req.user.id !== req.params._id) {
+                return res.status(401).json({message:"Non sei autorizzato"})
+            }
+
             if (user.role !== 'dealer') {
                 return res.status(403).json({ message: "L'utente non è un dealer" })
             }
+
             const newService = new Service({
                 name: data.name,
                 description: data.description,
                 cost: data.cost,
                 dealer: id
             })
+
             await newService.save()
             user.services.push(newService._id)
             await user.save()
@@ -49,6 +60,9 @@ module.exports = {
             if (!service) {
                 return res.status(404).json({ message: "Servizio non trovato" })
             }
+            if(service.dealer !== req.user.id) {
+                return res.status(401).json({ message: "Non sei autorizzato" })
+            }
             service.set(updates)
             const newService = await service.save()
             res.status(200).json({ message: "Servizio modificato con successo", service: newService })
@@ -63,7 +77,13 @@ module.exports = {
         const serviceId = req.params.serviceId
 
         try {
-            const user = await User.findById({ _id: userId }).populate("orders", "service")
+
+            if(req.user.id !== userId) {
+                return res.status(401).json({message:"Non sei autorizzato"})
+            }
+
+            const user = await User.findById({ _id: userId })
+                .populate("orders", "service")
             const service = await Service.findById({ _id: serviceId })
 
             if (!user) {
@@ -87,7 +107,7 @@ module.exports = {
             }
             service.comments.push(comment)
             await service.save()
-            res.status(200).json({ message: "Commento aggiunto con successo" })
+            res.status(201).json({ message: "Commento aggiunto con successo" })
         } catch (err) {
             res.status(500).json({ message: "Errore interno del server", error: err })
         }
@@ -99,6 +119,9 @@ module.exports = {
         const userId = req.params._id
 
         try {
+            if(req.user.id !== userId) {
+                return res.status(401).json({message:"Non sei autorizzato"})
+            }
             const service = await Service.findOne({ "comments._id": commentId })
             if (!service) {
                 return res.status(404).json({ message: "Servizio o commento non trovato" })
@@ -135,7 +158,8 @@ module.exports = {
 
     getAllServices: async function (req, res) {
         try {
-            const services = await Service.find().populate("dealer", "name lastname username city")
+            const services = await Service.find()
+                .populate("dealer", "name lastname username city")
             return res.status(200).json(services)
         } catch (err) {
             res.status(500).json({ message: "Errore interno del server" })
@@ -159,6 +183,10 @@ module.exports = {
         const serviceId = req.params.serviceId;
 
         try {
+            if(userId !== req.user.id){
+                return res.status(401).json({ message: "Non sei autorizzato" })
+            }
+
             const service = await Service.findById(serviceId);
             if (!service) {
                 return res.status(404).json({ message: "Servizio non trovato" });
@@ -183,6 +211,9 @@ module.exports = {
         const commentId = req.params.commentId;
 
         try {
+            if(userId !== req.user.id){
+                return res.status(401).json({ message: "Non sei autorizzato" })
+            }
             const service = await Service.findOne({ "comments._id": commentId });
             if (!service) {
                 return res.status(404).json({ message: "Commento non trovato" });
@@ -190,12 +221,10 @@ module.exports = {
 
             const comment = service.comments.id(commentId);
 
-            // Verifica che l'utente sia l'autore del commento
             if (comment.user.toString() !== userId) {
                 return res.status(403).json({ message: "Non autorizzato a eliminare questo commento" });
             }
 
-            // Rimuovi il commento dall'array
             service.comments.pull(commentId);
             await service.save();
 
