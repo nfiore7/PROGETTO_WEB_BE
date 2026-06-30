@@ -60,7 +60,7 @@ module.exports = {
             if (!service) {
                 return res.status(404).json({ message: "Servizio non trovato" })
             }
-            if(service.dealer !== req.user.id) {
+            if(service.dealer.toString() !== req.user.id) {
                 return res.status(401).json({ message: "Non sei autorizzato" })
             }
             service.set(updates)
